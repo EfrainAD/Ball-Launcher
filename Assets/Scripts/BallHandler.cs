@@ -24,7 +24,11 @@ public class BallHandler : MonoBehaviour
             
             Vector3 worldPosition = mainCamera.ScreenToWorldPoint(touchLoc);
 
+            ballRigidbody.isKinematic = true;
             ballRigidbody.position = worldPosition;
+        }
+        else {
+            ballRigidbody.isKinematic = false;
         }
     }
 }

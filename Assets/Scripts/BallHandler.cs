@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class BallHandler : MonoBehaviour
 {
     private Camera mainCamera;
+    [SerializeField] private Rigidbody2D ballRigidbody;
 
 
     // Start is called before the first frame update
@@ -23,7 +24,7 @@ public class BallHandler : MonoBehaviour
             
             Vector3 worldPosition = mainCamera.ScreenToWorldPoint(touchLoc);
 
-            Debug.Log(worldPosition);
+            ballRigidbody.position = worldPosition;
         }
     }
 }

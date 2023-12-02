@@ -7,9 +7,15 @@ using UnityEngine.InputSystem;
 public class BallHandler : MonoBehaviour
 {
     private Camera mainCamera;
-    [SerializeField] private Rigidbody2D ballRigidbody;
-    [SerializeField] private SpringJoint2D ballSpringJoint;
+    
+    [SerializeField] private GameObject ball;
+    [SerializeField] private Rigidbody2D pivot;
+
+    private Rigidbody2D currentBallRigidbody;
+    private SpringJoint2D currentBallSpringJoint;
+    
     [SerializeField] private float delayDuration;
+    [SerializeField] private float delayReSpawn;
     private bool isDragging;
 
 
@@ -17,12 +23,13 @@ public class BallHandler : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
+        SpawnBall();
     }
 
     // Update is called once per frame
-    void Update()
+    void Update() 
     {
-        if (ballRigidbody == null) {return;}
+        if (currentBallRigidbody == null) {return;}
 
         if (Touchscreen.current.primaryTouch.press.isPressed)
         {
@@ -30,9 +37,9 @@ public class BallHandler : MonoBehaviour
             
             Vector3 worldPosition = mainCamera.ScreenToWorldPoint(touchLoc);
 
-            ballRigidbody.position = worldPosition;
+            currentBallRigidbody.position = worldPosition;
             isDragging = true;
-            ballRigidbody.isKinematic = true;
+            currentBallRigidbody.isKinematic = true;
         }
         else {
             if (isDragging)
@@ -44,15 +51,25 @@ public class BallHandler : MonoBehaviour
         }
     }
 
+    private void SpawnBall() 
+    {
+        GameObject newBall = Instantiate(ball, pivot.position, Quaternion.identity);
+        
+        currentBallRigidbody = newBall.GetComponent<Rigidbody2D>();
+        currentBallSpringJoint = newBall.GetComponent<SpringJoint2D>();
+        
+        currentBallSpringJoint.connectedBody = pivot;
+    }
     private void LaunchBall() 
     {
-        ballRigidbody.isKinematic = false;
-        ballRigidbody = null;
+        currentBallRigidbody.isKinematic = false;
+        currentBallRigidbody = null;
         Invoke(nameof(DetatchBall), delayDuration);
+        Invoke(nameof(SpawnBall), delayReSpawn);
     }
     private void DetatchBall() 
     {
-        ballSpringJoint.enabled = false;
-        ballSpringJoint = null;
+        currentBallSpringJoint.enabled = false;
+        currentBallSpringJoint = null;
     }
 }
